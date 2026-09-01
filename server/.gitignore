@@ -1,0 +1,20 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Cloud File Storage Application — server .gitignore
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Environment / secrets ────────────────────────────────────────────────────
+# NEVER commit real credentials. Use server/.env.example as the safe reference.
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.auth-secret
+.users-db.json
+
+# ── TypeScript compiled output ───────────────────────────────────────────────
+dist/
+*.tsbuildinfo
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log

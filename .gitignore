@@ -1,0 +1,36 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Cloud File Storage Application Using AWS — root .gitignore
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Environment / secrets ────────────────────────────────────────────────────
+# NEVER commit real credentials. Use .env.example as the safe reference.
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.auth-secret
+.users-db.json
+
+# ── Node.js ──────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Next.js ──────────────────────────────────────────────────────────────────
+.next/
+out/
+
+# ── TypeScript ───────────────────────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Build outputs ────────────────────────────────────────────────────────────
+dist/
+build/
+
+# ── Miscellaneous ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log

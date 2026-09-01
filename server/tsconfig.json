@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "noEmit": false,
+    "jsx": "react-jsx",
+    "types": ["node", "express", "multer"]
+  },
+  "include": ["src/**/*.ts", "../src/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}

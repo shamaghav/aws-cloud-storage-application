@@ -13,7 +13,8 @@ const app = express();
 const port = Number(process.env.PORT ?? 5000);
 
 // Use http://localhost:3000 as the official frontend origin
-const frontendOrigin = "http://localhost:3000";
+const frontendOrigin =
+  process.env.FRONTEND_ORIGIN ?? "http://localhost:3000";
 
 // ── Global middleware ──────────────────────────────────────────────────────
 app.use(

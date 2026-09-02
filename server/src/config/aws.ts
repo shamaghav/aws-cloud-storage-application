@@ -57,10 +57,6 @@ export function createS3Client() {
   const config = validateAwsConfiguration();
 
   return new S3Client({
-    region: config.region,
-    credentials: {
-      accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey,
-    },
-  });
+  region: config.region,
+});
 }

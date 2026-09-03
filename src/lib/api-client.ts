@@ -13,12 +13,30 @@ function encodeS3Key(key: string) {
   return encodeURIComponent(key);
 }
 
-async function readJson<T>(response: Response): Promise<T & { message?: string; error?: string | boolean }> {
-  const data = (await response.json()) as T & { message?: string; error?: string | boolean };
+async function readJson<T>(
+  response: Response
+): Promise<T & { message?: string; error?: string | boolean }> {
+  const text = await response.text();
+
+  let data: any = {};
+
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(
+      `API returned invalid response (${response.status}): ${text.slice(0, 200)}`
+    );
+  }
+
   if (!response.ok) {
-    const message = data.message ?? (typeof data.error === "string" ? data.error : undefined) ?? "Request failed";
+    const message =
+      data.message ??
+      (typeof data.error === "string" ? data.error : undefined) ??
+      `Request failed (${response.status})`;
+
     throw new Error(message);
   }
+
   return data;
 }
 
@@ -44,8 +62,8 @@ export async function deleteFile(key: string) {
   return readJson<{ ok?: boolean; success?: boolean; message?: string; error?: string | boolean }>(response);
 }
 
-export async function getDownloadUrl(key: string) {
-  const response = await fetch(`/api/files/${encodeS3Key(key)}/download`, {
+ export async function getDownloadUrl(key: string) {
+  const response = await fetch(`/api/files/download?key=${encodeURIComponent(key)}`, {
     credentials: "include",
   });
   const data = await readJson<{ ok?: boolean; success?: boolean; download?: { url: string }; message?: string; error?: string | boolean }>(response);

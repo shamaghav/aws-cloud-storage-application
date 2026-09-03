@@ -313,7 +313,19 @@ export async function deleteCloudFile(key: string) {
 export async function createDownloadUrl(key: string) {
   assertStorageConfigured();
   const s3 = makeS3Client();
-  const url = await getSignedUrl(s3, new GetObjectCommand({ Bucket: bucketName, Key: key }), { expiresIn: 60 * 5 });
+
+  const fileName = key.split("/").pop()?.replace(/"/g, "") || "download";
+
+  const url = await getSignedUrl(
+    s3,
+    new GetObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      ResponseContentDisposition: `attachment; filename="${fileName}"`,
+    }),
+    { expiresIn: 60 * 5 }
+  );
+
   return { key, url, expiresInSeconds: 300 };
 }
 

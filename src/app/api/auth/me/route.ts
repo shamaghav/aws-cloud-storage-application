@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
     }
 
     const token = await signToken({
+      sub: user.id,
       email: user.email,
       fullName: user.fullName,
     });
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
       ok: true,
       message: "Login successful.",
       user: {
-        id: user.id,
+        sub: user.id,
         email: user.email,
         fullName: user.fullName,
       },
@@ -81,4 +82,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+
 

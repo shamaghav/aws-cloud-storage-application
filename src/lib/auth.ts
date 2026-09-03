@@ -67,7 +67,7 @@ export type JwtPayload = {
 export async function signToken(payload: JwtPayload): Promise<string> {
   return new SignJWT({ email: payload.email, fullName: payload.fullName })
     .setProtectedHeader({ alg: "HS256" })
-    .setSubject(payload.id)
+    .setSubject(payload.sub)
     .setIssuedAt()
     .setExpirationTime(JWT_EXPIRY)
     .sign(getJwtSecret());
@@ -246,4 +246,5 @@ export function parseAuthCookie(cookieHeader: string | null): string | null {
   }
   return null;
 }
+
 

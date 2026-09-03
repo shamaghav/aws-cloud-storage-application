@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+﻿import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const BCRYPT_ROUNDS = 12;
 const JWT_EXPIRY = "7d";
@@ -20,7 +20,7 @@ export class AuthConfigurationError extends Error {
   }
 }
 
-// ─── JWT helpers ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ JWT helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function getRawJwtSecret(): string {
   let secret = process.env.JWT_SECRET;
@@ -67,7 +67,7 @@ export type JwtPayload = {
 export async function signToken(payload: JwtPayload): Promise<string> {
   return new SignJWT({ email: payload.email, fullName: payload.fullName })
     .setProtectedHeader({ alg: "HS256" })
-    .setSubject(payload.sub)
+    .setSubject(payload.id)
     .setIssuedAt()
     .setExpirationTime(JWT_EXPIRY)
     .sign(getJwtSecret());
@@ -86,7 +86,7 @@ export async function verifyToken(token: string): Promise<JwtPayload | null> {
   }
 }
 
-// ─── Password helpers ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Password helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, BCRYPT_ROUNDS);
@@ -96,7 +96,7 @@ export async function verifyPassword(plain: string, hashed: string): Promise<boo
   return bcrypt.compare(plain, hashed);
 }
 
-// ─── Validation helpers ───────────────────────────────────────────────────────
+// â”€â”€â”€ Validation helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
@@ -112,7 +112,7 @@ export function validateFullName(name: string): string | null {
   return null;
 }
 
-// ─── Local JSON database fallback (private and gitignored) ────────────────────
+// â”€â”€â”€ Local JSON database fallback (private and gitignored) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const localDbFile = path.join(process.cwd(), ".users-db.json");
 
@@ -136,7 +136,7 @@ function writeLocalUsers(data: User[]) {
   }
 }
 
-// ─── User service ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ User service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export type SafeUser = Omit<User, "hashedPassword">;
 
@@ -214,7 +214,7 @@ export async function createUser(data: {
   return stripPassword(newUser);
 }
 
-// ─── Cookie helpers (used by Next.js API routes) ──────────────────────────────
+// â”€â”€â”€ Cookie helpers (used by Next.js API routes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export { COOKIE_NAME };
 
@@ -246,3 +246,4 @@ export function parseAuthCookie(cookieHeader: string | null): string | null {
   }
   return null;
 }
+

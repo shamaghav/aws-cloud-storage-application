@@ -316,75 +316,86 @@ export default function CloudStorageApp() {
     void loadAwsStatus();
   }, [authed, files.length]);
 
-  // async function handleLogin(e: FormEvent) {
+// async function handleLogin(e: FormEvent) {
+  async function handleLogin(e: FormEvent) {
   e.preventDefault();
   setAuthError(null);
-  if (!email.trim()) { setAuthError("Email is required."); return; }
-  if (!password) { setAuthError("Password is required."); return; }
+  setAuthSuccess(null);
+
+  if (!email.trim()) {
+    setAuthError("Email is required.");
+    return;
+  }
+
+  if (!password) {
+    setAuthError("Password is required.");
+    return;
+  }
+
   setAuthLoading(true);
 
   try {
     const res = await fetch("/api/auth/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       credentials: "include",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email,
+        password,
+      }),
     });
 
-    // ...
+    const data = (await res.json()) as {
+      ok?: boolean;
+      error?: string;
+      message?: string;
+      user?: {
+        sub: string;
+        email: string;
+        fullName: string;
+      };
+    };
+
+    if (!res.ok || !data.ok || !data.user) {
+      setAuthError(data.error ?? "Invalid email or password.");
+      return;
+    }
+
+    setCurrentUser({
+      id: data.user.sub,
+      email: data.user.email,
+      fullName: data.user.fullName,
+    });
+
+    setAuthed(true);
+    setPage("dashboard");
+    setPassword("");
+  } catch (err) {
+    setAuthError(
+      err instanceof Error
+        ? err.message
+        : "Network error. Please try again."
+    );
+  } finally {
+    setAuthLoading(false);
   }
 }
 
-  async function handleRegister(e: FormEvent) {
-    e.preventDefault();
-    setAuthError(null);
-    setAuthSuccess(null);
-    if (!regFullName.trim()) { setAuthError("Full name is required."); return; }
-    if (!regEmail.trim()) { setAuthError("Email is required."); return; }
-    if (!regPassword) { setAuthError("Password is required."); return; }
-    if (regPassword.length < 8) { setAuthError("Password must be at least 8 characters."); return; }
-    if (regPassword !== regConfirm) { setAuthError("Passwords do not match."); return; }
-    setAuthLoading(true);
-    try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName: regFullName, email: regEmail, password: regPassword, confirmPassword: regConfirm }),
-      });
-      
-      let data: { message?: string; error?: string } = {};
-      try {
-        data = await res.json();
-      } catch (jsonErr) {
-        console.error("Failed to parse register JSON:", jsonErr);
-        setAuthError("Server returned an invalid response.");
-        return;
-      }
-
-      if (!res.ok) {
-        setAuthError(data.error ?? "Registration failed.");
-        return;
-      }
-      setAuthSuccess("Account created successfully. Please sign in.");
-      setRegFullName(""); setRegEmail(""); setRegPassword(""); setRegConfirm("");
-      setAuthView("login");
-    } catch (err) {
-      console.error("Registration request failed:", err);
-      setAuthError(err instanceof Error ? err.message : "Network error. Please try again.");
-    } finally {
-      setAuthLoading(false);
-    }
-  }
-
-  async function handleLogout() {
-    try {
-      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    } catch { /* best effort */ }
+async function handleLogout() {
+  try {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+  } finally {
     setAuthed(false);
     setCurrentUser(null);
-    setFiles([]);
-    setPage("dashboard");
+    setPage("landing");
+    setPassword("");
   }
+}
 
   // ── File actions ───────────────────────────────────────────────────────────
 
@@ -926,19 +937,24 @@ export default function CloudStorageApp() {
         </main>
       </div>
 
-      {/* Delete dialog */}
-      {deleteTarget && (
-        <DeleteDialog
-          file={deleteTarget}
-          onConfirm={handleDeleteConfirmed}
-          onCancel={() => setDeleteTarget(null)}
-        />
-      )}
+              {/* Delete dialog */}
+        {deleteTarget ? (
+          <DeleteDialog
+            file={deleteTarget}
+            onConfirm={handleDeleteConfirmed}
+            onCancel={() => setDeleteTarget(null)}
+          />
+        ) : null}
 
-      {/* Toast */}
-      {toast && <ToastBar toast={toast} onDismiss={() => setToast(null)} />}
-    </div>
-  );
+        {/* Toast */}
+        {toast ? (
+          <ToastBar
+            toast={toast}
+            onDismiss={() => setToast(null)}
+          />
+        ) : null}
+      </div>
+    );
 }
 
 // ─── Page label ───────────────────────────────────────────────────────────────

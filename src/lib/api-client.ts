@@ -55,11 +55,20 @@ export async function fetchFiles(params: { search?: string; filter?: FileCategor
 }
 
 export async function deleteFile(key: string) {
-  const response = await fetch(`/api/files/${encodeS3Key(key)}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-  return readJson<{ ok?: boolean; success?: boolean; message?: string; error?: string | boolean }>(response);
+  const response = await fetch(
+    `/api/files?key=${encodeURIComponent(key)}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
+
+  return readJson<{
+    ok?: boolean;
+    success?: boolean;
+    message?: string;
+    error?: string | boolean;
+  }>(response);
 }
 
  export async function getDownloadUrl(key: string) {

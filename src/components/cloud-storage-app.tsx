@@ -392,7 +392,7 @@ async function handleLogout() {
   } finally {
     setAuthed(false);
     setCurrentUser(null);
-    setPage("landing");
+    setPage("auth");
     setPassword("");
   }
 }

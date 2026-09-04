@@ -316,46 +316,24 @@ export default function CloudStorageApp() {
     void loadAwsStatus();
   }, [authed, files.length]);
 
-  // ── Auth ───────────────────────────────────────────────────────────────────
+  // async function handleLogin(e: FormEvent) {
+  e.preventDefault();
+  setAuthError(null);
+  if (!email.trim()) { setAuthError("Email is required."); return; }
+  if (!password) { setAuthError("Password is required."); return; }
+  setAuthLoading(true);
 
-  async function handleLogin(e: FormEvent) {
-    e.preventDefault();
-    setAuthError(null);
-    if (!email.trim()) { setAuthError("Email is required."); return; }
-    if (!password) { setAuthError("Password is required."); return; }
-    setAuthLoading(true);
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-      
-      let data: { user?: { id: string; email: string; fullName: string }; error?: string } = {};
-      try {
-        data = await res.json();
-      } catch (jsonErr) {
-        console.error("Failed to parse JSON response:", jsonErr);
-        setAuthError("Server returned an invalid response.");
-        return;
-      }
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (!res.ok) {
-        setAuthError(data.error ?? "Login failed.");
-        return;
-      }
-      setCurrentUser(data.user ?? null);
-      setAuthed(true);
-      setEmail("");
-      setPassword("");
-    } catch (err) {
-      console.error("Login request failed:", err);
-      setAuthError(err instanceof Error ? err.message : "Network error. Please try again.");
-    } finally {
-      setAuthLoading(false);
-    }
+    // ...
   }
+}
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();
